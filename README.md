@@ -1,0 +1,1 @@
+# team-configmind-impact-analyzer
