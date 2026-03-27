@@ -1,0 +1,23 @@
+# ConfigMind — Known Bugs
+# These are active platform bugs that must be checked during impact analysis.
+# Format: each bug has id, severity, status, change_types_affected, description, risk.
+
+bugs:
+  - id: VOYAGE-1988
+    severity: critical
+    status: active
+    change_types_affected:
+      - groups.fatigue.remove_group
+    description: >
+      Removing a fatigue behavior from a single group via the workflow admin API
+      deletes that behavior entry for ALL groups sharing the same workflow ID.
+      The API does not support per-group behavior removal on a shared workflow —
+      it modifies the shared workflow object directly.
+    risk: >
+      Any group sharing this workflow will silently lose the fatigue behavior,
+      stopping fatigue alerts and coaching for all their drivers with no warning.
+    mitigation: >
+      Before removing a fatigue behavior, check how many groups share this workflow
+      using get_groups_sharing_workflow. If more than 1 group shares it, escalate
+      to HOTL — the workflow must be cloned before the behavior is removed.
+    approval_override: hotl

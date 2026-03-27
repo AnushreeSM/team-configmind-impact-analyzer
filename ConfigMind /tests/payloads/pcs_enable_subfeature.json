@@ -1,0 +1,22 @@
+{
+  "changeType": "pcs.enable_sub_feature",
+  "targetScope": {
+    "groupId": "2bb2d9b4-c801-e111-81ce-e61f13277aab",
+    "groupName": "Northeast Fleet",
+    "companyId": 1129
+  },
+  "proposedChanges": [
+    {
+      "entityType": "subFeature",
+      "entityId": "food-and-drink-events-sub-feature-uuid",
+      "entityName": "Food and Drink Events",
+      "field": "isEnabled",
+      "currentValue": false,
+      "proposedValue": true,
+      "params": {
+        "featureFileName": "foodanddrink",
+        "subFeatureName": "Events"
+      }
+    }
+  ]
+}

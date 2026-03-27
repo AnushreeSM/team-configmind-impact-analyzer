@@ -1,0 +1,398 @@
+{
+  "_meta": {
+    "source": "PRD: Self-serve in-cab mv+ai V2 — lytx.atlassian.net/wiki/spaces/SA/pages/21299167237",
+    "sample_fleets": 847,
+    "data_window_days": 90,
+    "note": "Config names are UI display names only. Backend setting names are intentionally excluded."
+  },
+
+  "fleet_size_bands": {
+    "small":      { "label": "Small",      "min_drivers": 0,   "max_drivers": 49   },
+    "medium":     { "label": "Medium",     "min_drivers": 50,  "max_drivers": 199  },
+    "large":      { "label": "Large",      "min_drivers": 200, "max_drivers": 499  },
+    "enterprise": { "label": "Enterprise", "min_drivers": 500, "max_drivers": 99999 }
+  },
+
+  "behaviors": {
+    "food_and_drink":   { "display_name": "Food or Drink",     "key": "food_and_drink"   },
+    "handheld_device":  { "display_name": "Handheld Device",   "key": "handheld_device"  },
+    "driver_unbelted":  { "display_name": "Driver Unbelted",   "key": "driver_unbelted"  },
+    "smoking":          { "display_name": "Smoking",           "key": "smoking"          },
+    "inattentive":      { "display_name": "Inattentive",       "key": "inattentive"      },
+    "lens_obstruction": { "display_name": "Lens Obstruction",  "key": "lens_obstruction" }
+  },
+
+  "alert_configurations": {
+
+    "delay": {
+      "config_name": "Delay",
+      "description": "How long the behavior must continue before the first alert sounds.",
+      "mode": "basic",
+      "custom_label": "Set Custom Delay",
+      "custom_description": "Set how long the system waits before sending an alert.",
+      "custom_range": { "min": 5, "max": 240, "unit": "seconds" },
+      "presets": {
+        "immediate": {
+          "label": "Immediate",
+          "warning": "Alerts may trigger too quickly. May cause false positives.",
+          "values_by_behavior": {
+            "Food or Drink":    10,
+            "Handheld Device":  10,
+            "Driver Unbelted":  10,
+            "Smoking":          10,
+            "Inattentive":      20,
+            "Lens Obstruction": 10
+          }
+        },
+        "default": {
+          "label": "Default",
+          "description": "Balanced response time and event creation.",
+          "values_by_behavior": {
+            "Food or Drink":    20,
+            "Handheld Device":  20,
+            "Driver Unbelted":  20,
+            "Smoking":          20,
+            "Inattentive":      60,
+            "Lens Obstruction": 20
+          }
+        },
+        "delayed": {
+          "label": "Delayed",
+          "warning": "Alerts will trigger later, reducing event count and responsiveness.",
+          "values_by_behavior": {
+            "Food or Drink":    30,
+            "Handheld Device":  30,
+            "Driver Unbelted":  30,
+            "Smoking":          30,
+            "Inattentive":      120,
+            "Lens Obstruction": 30
+          }
+        }
+      }
+    },
+
+    "repeat_delay": {
+      "config_name": "Repeat Delay",
+      "description": "How long to wait before repeating an alert if the behavior continues.",
+      "mode": "basic",
+      "custom_label": "Set Custom Repeat Interval",
+      "custom_description": "Set how long to wait before repeating an alert.",
+      "custom_range": { "min": 5, "max": 240, "unit": "seconds" },
+      "presets": {
+        "frequent": {
+          "label": "Frequent",
+          "warning": "Alerts repeat quickly — increases driver responsiveness but may feel disruptive.",
+          "value_all_behaviors": 10
+        },
+        "default": {
+          "label": "Default",
+          "description": "Balanced repeat frequency for ongoing behaviors.",
+          "value_all_behaviors": 20
+        },
+        "delayed": {
+          "label": "Delayed",
+          "warning": "Alerts repeat less often; may reduce effectiveness of alerts.",
+          "value_all_behaviors": 30
+        }
+      }
+    },
+
+    "mute_time": {
+      "config_name": "Mute Time",
+      "description": "Time after an alert when new alerts are temporarily paused.",
+      "mode": "basic",
+      "custom_label": "Set Custom Mute Time",
+      "custom_description": "Set how long alerts stay muted after the last one.",
+      "custom_range": { "min": 5, "max": 86400, "unit": "seconds" },
+      "presets": {
+        "short_mute": {
+          "label": "Short Mute",
+          "warning": "Short mute interval — allows faster re-alerts, increasing responsiveness but possibly over-alerting.",
+          "values_by_behavior": {
+            "Food or Drink":    10,
+            "Handheld Device":  10,
+            "Driver Unbelted":  10,
+            "Smoking":          10,
+            "Inattentive":      10,
+            "Lens Obstruction": 30
+          }
+        },
+        "default": {
+          "label": "Default",
+          "description": "Balanced mute interval prevents over-alerting.",
+          "values_by_behavior": {
+            "Food or Drink":    20,
+            "Handheld Device":  20,
+            "Driver Unbelted":  20,
+            "Smoking":          20,
+            "Inattentive":      20,
+            "Lens Obstruction": 3600
+          }
+        },
+        "long_mute": {
+          "label": "Long Mute",
+          "warning": "Long mute may suppress valid alerts, reducing detection accuracy.",
+          "values_by_behavior": {
+            "Food or Drink":    30,
+            "Handheld Device":  30,
+            "Driver Unbelted":  30,
+            "Smoking":          30,
+            "Inattentive":      30,
+            "Lens Obstruction": 7200
+          }
+        }
+      }
+    },
+
+    "max_repeats": {
+      "config_name": "Max Repeats",
+      "description": "How many times the system repeats an alert before stopping.",
+      "mode": "basic",
+      "custom_label": "Set Custom Repeat Limit",
+      "custom_description": "Set how many times alerts can repeat before stopping.",
+      "custom_range": { "min": 0, "max": 5, "unit": "count" },
+      "presets": {
+        "quick": {
+          "label": "Quick",
+          "warning": "Event may be created after very few alerts; high event volume risk.",
+          "value_all_behaviors": 2
+        },
+        "default": {
+          "label": "Default",
+          "description": "Balanced repeat count for stable event creation.",
+          "value_all_behaviors": 3
+        },
+        "high": {
+          "label": "High",
+          "warning": "Requires multiple repeats; may lower event volume.",
+          "value_all_behaviors": 4
+        }
+      }
+    },
+
+    "min_speed": {
+      "config_name": "Min Speed",
+      "description": "The minimum speed required before alerts can trigger.",
+      "mode": "advanced",
+      "custom_label": "Set Custom Speed Threshold",
+      "custom_description": "Set the minimum vehicle speed required to trigger alerts.",
+      "custom_range": { "min": 0, "max": 40, "unit": "kph" },
+      "preset_warnings": {
+        "low":  "Alerts may trigger while vehicle is stationary.",
+        "high": "Alerts will not trigger at lower speeds; risk of missing in-traffic events."
+      }
+    },
+
+    "confidence": {
+      "config_name": "Confidence",
+      "description": "Confidence level required before an alert is triggered.",
+      "mode": "advanced",
+      "custom_range": { "min": 0, "max": 100, "unit": "%" },
+      "default": 95,
+      "preset_warnings": {
+        "sensitive": "Lower confidence threshold; more alerts, higher false positives.",
+        "strict":    "Higher confidence threshold; fewer alerts, risk of missed events."
+      }
+    }
+  },
+
+  "event_configurations": {
+
+    "alert_threshold": {
+      "config_name": "Alert Threshold",
+      "description": "Number of alerts of a given risk type that must be activated before event creation is triggered.",
+      "mode": "advanced",
+      "default": 3,
+      "range": { "min": 2, "max": 5, "unit": "count" },
+      "presets": {
+        "quick_trigger": {
+          "label": "Quick Trigger",
+          "value": 2,
+          "warning": "Events created too quickly; may flood reporting."
+        },
+        "default": {
+          "label": "Default",
+          "value": 3,
+          "description": "Balanced threshold for event creation."
+        },
+        "delayed_trigger": {
+          "label": "Delayed Trigger",
+          "value": 4,
+          "warning": "Higher threshold; fewer events created, possible underreporting."
+        }
+      }
+    },
+
+    "event_detection_window": {
+      "config_name": "Event Detection Window",
+      "description": "The rolling time period in which the specified number of alerts must occur before event creation is triggered.",
+      "mode": "advanced",
+      "default": 2,
+      "range": { "min": 1, "max": 86400, "unit": "minutes" },
+      "presets": {
+        "quick": {
+          "label": "Quick",
+          "value": 2,
+          "warning": "Events created very quickly; risk of high volume."
+        },
+        "default": {
+          "label": "Default",
+          "value": 3,
+          "description": "Balanced event window for normal fleet operations."
+        },
+        "extended": {
+          "label": "Extended",
+          "value": 5,
+          "warning": "Events may not trigger unless alerts spread across a longer time; fewer events."
+        }
+      },
+      "guardrail_note": "Must verify that alert settings (Delay, Max Repeats, Repeat Delay) do not prevent event creation."
+    },
+
+    "event_snooze_duration": {
+      "config_name": "Event Snooze Duration",
+      "description": "The snooze period after an event is created before another event can be created for the same behavior.",
+      "mode": "advanced",
+      "default": 180,
+      "range": { "min": 60, "max": 86400, "unit": "minutes" },
+      "presets": {
+        "short": {
+          "label": "Short",
+          "value": 60,
+          "warning": "Frequent events; possible driver fatigue and alert overload."
+        },
+        "default": {
+          "label": "Default",
+          "value": 180,
+          "description": "Balanced snooze; prevents duplicates while capturing risk."
+        },
+        "extended": {
+          "label": "Extended",
+          "value": 360,
+          "warning": "Events suppressed for long periods; risk of missing repeated behaviors."
+        }
+      }
+    }
+  },
+
+  "guardrails": {
+    "delay_vs_event_window": {
+      "rule": "Delay ≤ Event Detection Window",
+      "error_message": "Delay cannot exceed Event Detection Window. No events would be generated in this setup."
+    },
+    "event_creation_feasibility": {
+      "rule": "(Max Repeats × Repeat Delay) + Delay ≤ Event Detection Window",
+      "error_message": "Max Repeats and Delay together must fit within Event Detection Window. Current setup would prevent event creation."
+    }
+  },
+
+  "threshold_stats": {
+    "config_name": "Alert Threshold",
+    "description": "Alert Threshold outcomes across 847 fleets — 90-day window",
+    "by_threshold": {
+      "2": {
+        "events_per_driver_per_month": 16.1,
+        "coaching_completion_pct": 21,
+        "false_positive_pct": 42,
+        "revert_within_14_days_pct": 67,
+        "label": "Quick Trigger — floods coaching queue"
+      },
+      "3": {
+        "events_per_driver_per_month": 8.5,
+        "coaching_completion_pct": 58,
+        "false_positive_pct": 22,
+        "revert_within_14_days_pct": 18,
+        "label": "Default — balanced for most fleets"
+      },
+      "4": {
+        "events_per_driver_per_month": 5.0,
+        "coaching_completion_pct": 78,
+        "false_positive_pct": 11,
+        "revert_within_14_days_pct": 7,
+        "label": "Delayed Trigger — best coaching completion"
+      },
+      "5": {
+        "events_per_driver_per_month": 3.2,
+        "coaching_completion_pct": 82,
+        "false_positive_pct": 8,
+        "revert_within_14_days_pct": 3,
+        "label": "High — very low event volume"
+      }
+    },
+    "optimal_by_fleet_size": {
+      "small":      3,
+      "medium":     3,
+      "large":      3,
+      "enterprise": 4
+    },
+    "insight": "67% of fleets that set Alert Threshold=2 (Quick Trigger) reverted within 14 days due to coaching queue overload."
+  },
+
+  "alert_config_stats": {
+    "description": "In-cab alert combination effectiveness — self-correction rates",
+    "combinations": {
+      "audio_and_led": {
+        "label": "Audio + LED",
+        "self_correction_pct": 73,
+        "event_volume_reduction_pct": 28,
+        "recommended": true
+      },
+      "audio_only": {
+        "label": "Audio only",
+        "self_correction_pct": 62,
+        "event_volume_reduction_pct": 15,
+        "recommended": false
+      },
+      "led_only": {
+        "label": "LED only",
+        "self_correction_pct": 41,
+        "event_volume_reduction_pct": 9,
+        "recommended": false
+      },
+      "neither": {
+        "label": "No alerts",
+        "self_correction_pct": 0,
+        "event_volume_reduction_pct": 0,
+        "recommended": false,
+        "warning": "Disabling both Audio and LED alerts causes event generation to stop entirely."
+      }
+    },
+    "insight": "Disabling both Audio and LED alerts causes event generation to stop entirely."
+  },
+
+  "group_move_stats": {
+    "description": "Group move propagation data — 90-day window",
+    "best_windows_utc": [
+      "Saturday 02:00–06:00 UTC",
+      "Sunday 02:00–06:00 UTC"
+    ],
+    "propagation_hours_by_fleet_size": {
+      "small":      2.1,
+      "medium":     4.5,
+      "large":      7.2,
+      "enterprise": 12.4
+    },
+    "downstream_services_notified": 18,
+    "admins_aware_of_cascade_pct": 31,
+    "insight": "Only 31% of admins realise a group move triggers 18 downstream service notifications."
+  },
+
+  "group_delete_stats": {
+    "description": "Group deletion impact data",
+    "avg_orphaned_safety_events": 87,
+    "fleets_that_reassigned_first_pct": 34,
+    "recommended_action": "Reassign all safety events to the parent group before deleting.",
+    "insight": "66% of fleets that deleted a group without reassignment lost safety event history."
+  },
+
+  "behavior_enrollment_stats": {
+    "description": "Fatigue behavior add/remove group outcomes",
+    "admins_unaware_of_rolldown_pct": 89,
+    "workflows_shared_pct": 72,
+    "avg_groups_sharing_workflow": 5,
+    "recommended_level": "lowest_group",
+    "rolldown_trigger": "Adding a parent group applies the behavior to ALL child groups automatically.",
+    "remove_warning": "Removing one group from a shared workflow removes the behavior for ALL groups on that workflow.",
+    "insight": "89% of admins were unaware their behavior add/remove cascaded to other groups."
+  }
+}

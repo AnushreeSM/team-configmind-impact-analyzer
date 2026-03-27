@@ -1,0 +1,24 @@
+{
+  "changeType": "pcs.change_delay",
+  "targetScope": {
+    "groupId": "2bb2d9b4-c801-e111-81ce-e61f13277aab",
+    "groupName": "Northeast Fleet",
+    "companyId": 1129
+  },
+  "proposedChanges": [
+    {
+      "entityType": "configurableSetting",
+      "entityId": "food-and-drink-delay",
+      "entityName": "Delay",
+      "field": "value",
+      "currentValue": 20,
+      "proposedValue": 10,
+      "params": {
+        "featureFileName": "foodanddrink",
+        "behaviorName": "Food or Drink",
+        "configName": "Delay",
+        "unit": "seconds"
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "changeType": "pcs.change_min_speed",
+  "targetScope": {
+    "groupId": "2bb2d9b4-c801-e111-81ce-e61f13277aab",
+    "groupName": "Northeast Fleet",
+    "companyId": 1129
+  },
+  "proposedChanges": [
+    {
+      "entityType": "configurableSetting",
+      "entityId": "food-and-drink-min-speed",
+      "entityName": "Min Speed",
+      "field": "value",
+      "currentValue": 5,
+      "proposedValue": 0,
+      "params": {
+        "featureFileName": "foodanddrink",
+        "behaviorName": "Food or Drink",
+        "configName": "Min Speed",
+        "unit": "kph"
+      }
+    }
+  ]
+}

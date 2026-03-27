@@ -1,0 +1,24 @@
+{
+  "changeType": "pcs.change_event_window",
+  "targetScope": {
+    "groupId": "2bb2d9b4-c801-e111-81ce-e61f13277aab",
+    "groupName": "Northeast Fleet",
+    "companyId": 1129
+  },
+  "proposedChanges": [
+    {
+      "entityType": "configurableSetting",
+      "entityId": "food-and-drink-event-window",
+      "entityName": "Event Detection Window",
+      "field": "value",
+      "currentValue": 3,
+      "proposedValue": 2,
+      "params": {
+        "featureFileName": "foodanddrink",
+        "behaviorName": "Food or Drink",
+        "configName": "Event Detection Window",
+        "unit": "minutes"
+      }
+    }
+  ]
+}

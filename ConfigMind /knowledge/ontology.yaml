@@ -1,0 +1,86 @@
+# ConfigMind Domain Ontology — Lytx Safety Platform
+# Modules: Groups, Vehicles, Users, Program Configuration
+
+concepts:
+  group:
+    description: "Hierarchical organizational unit. Every driver, vehicle, device belongs to a group."
+    blast_radius: "Highest in platform — changes propagate to 18+ downstream services via Kafka."
+    contains: [driver, vehicle, device, safety_event]
+    cascade: "Changes propagate to all descendant groups unless overridden."
+    key_insight: "Group hierarchy is the backbone. Moves ripple everywhere."
+
+  vehicle:
+    description: "Fleet vehicle. Binding layer between device, driver, safety events, and group."
+    belongs_to: [group]
+    attached_to: [device]
+    assigned_to: [driver]
+    key_insight: "Deleting orphans device, driver, and safety event associations silently."
+
+  device:
+    description: "Physical DriveCam device recording video and detecting behaviors."
+    attached_to: [vehicle]
+    belongs_to: [group]
+    produces: [safety_event, alert]
+    latency: "Config changes take effect when device next checks in — can be hours."
+
+  safety_event:
+    description: "Recorded safety incident — permanent compliance/audit record."
+    belongs_to: [group, vehicle, driver]
+    consumed_by: [coaching_workflow, reporting, compliance]
+    key_insight: "Orphaned safety events are PERMANENT audit trail corruption. Cannot be re-associated."
+
+  coaching_workflow:
+    description: "Rules for which events trigger coaching and what actions to take."
+    depends_on: [safety_event]
+    shared_across: [groups]
+    key_insight: "Workflows are shared. A single workflow may serve many groups — changes cascade silently."
+
+  alert:
+    description: "In-cab or On-Road audio/LED notification. Precursor to event creation."
+    produces: [safety_event]
+    controlled_by: [group_option, device_setting]
+    key_insight: "If Audio or LED is enabled, device generates alerts with configured settings. Events will be generated when the configurable settings for event is enabled. {{delaySec ≤ eventWindowDuration}} → ensures first alert can occur within window. Message : *Delay must be less than or equal to the event window duration* ** {{(maxRepeat * repeatSec) + delaySec ≤ eventWindowDuration}} → ensures event creation is feasible. Any changes in this will update device settings, group options and workflow service"
+
+  group_option:
+    description: "Configuration value at group level. Controls alert thresholds and firmware behavior."
+    naming_pattern: "Numeric IDs (381, 382). Names follow 'DC - Event - AlertPatt - {Behavior} - {Part}'."
+    affects: [device_firmware, alert, event_rate]
+    cascade: "Inherited by child groups unless overridden."
+
+  device_setting:
+    description: "Configuration pushed to physical device firmware on next check-in."
+    affects: [alert, device_firmware]
+    scope: "All devices in the target group and descendants."
+
+  shared_prerequisite:
+    description: "A device setting required by multiple features simultaneously."
+    examples:
+      - "Enable Master Video Services — required by all 6 in-cab MV+AI features"
+      - "Enable Unisyn DVR — required by video recording features"
+      - "GroupOption 417 (ADAS Modular App) — required by all ADAS features"
+    key_insight: "Disabling a shared prerequisite cascades to ALL dependent features."
+
+relationships:
+  threshold_controls_volume:
+    when: "A group_option with 'AlertPatt' in its name changes"
+    pattern: "Lower threshold value = more events generated. Higher = fewer."
+    confidence: high
+    example: "GO 381 = 3 means 3 alerts needed before event. GO 381 = 1 means instant event."
+
+  shared_workflow_cascade:
+    when: "A workflow behavior or action rule changes"
+    pattern: "If multiple groups share one workflow, change affects ALL sharing groups."
+    confidence: high
+    check: "Query workflow API for sharing groups (endpoint may not exist — flag as risk)."
+
+  prerequisite_cascade:
+    when: "A device setting that is shared by multiple features changes"
+    pattern: "Disabling it disables all features that require it."
+    confidence: high
+    indicators: ["Enable Master", "Enable Unisyn", "Enable Accel", "Enable VNET"]
+
+  group_hierarchy_scope:
+    when: "Any change targets a non-root group"
+    pattern: "Change affects target group AND all descendants."
+    confidence: high
+    check: "Query Groups API for descendant count."

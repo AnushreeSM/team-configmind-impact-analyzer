@@ -1,0 +1,24 @@
+{
+  "changeType": "pcs.change_event_snooze",
+  "targetScope": {
+    "groupId": "2bb2d9b4-c801-e111-81ce-e61f13277aab",
+    "groupName": "Northeast Fleet",
+    "companyId": 1129
+  },
+  "proposedChanges": [
+    {
+      "entityType": "configurableSetting",
+      "entityId": "food-and-drink-event-snooze",
+      "entityName": "Event Snooze Duration",
+      "field": "value",
+      "currentValue": 180,
+      "proposedValue": 60,
+      "params": {
+        "featureFileName": "foodanddrink",
+        "behaviorName": "Food or Drink",
+        "configName": "Event Snooze Duration",
+        "unit": "minutes"
+      }
+    }
+  ]
+}
